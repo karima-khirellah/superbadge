@@ -1,6 +1,6 @@
 @isTest
 public with sharing class WarehouseSyncScheduleTest {
-    // implement scheduled code here
+
     @isTest static void WarehousescheduleTest(){
         String scheduleTime = '00 00 01 * * ?';
         Test.startTest();
@@ -8,7 +8,7 @@ public with sharing class WarehouseSyncScheduleTest {
         String jobID=System.schedule('ScheduledWarehouseTest', scheduleTime, new WarehouseSyncSchedule());
         Test.stopTest();
         System.assertEquals('ScheduledWarehouseTest', [SELECT CronJobDetail.Name FROM CronTrigger WHERE Id = :jobID].CronJobDetail.Name, 'Expected job name to match');
-        // Add more assertions as needed       
+             
        
        
     }

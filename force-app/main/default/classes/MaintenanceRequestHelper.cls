@@ -57,26 +57,6 @@ public with sharing class MaintenanceRequestHelper {
     public static void createNewEquipmentMaintenanceItems(List<Case> newCreatedMRequests, Map<Id,Id> closedMaintenanceRequests){
 
         List<Equipment_Maintenance_Item__c> newEquipmentItems = new List<Equipment_Maintenance_Item__c>();
-        //need to bulkify this code and remove the SOQL from the loop
-        /*  for (Case mRequest : newCreatedMRequests) {
-                System.debug('the new maintenance request: '+mRequest);
-                //List<Equipment_Maintenance_Item__c> originalEquipmentItems = [SELECT Equipment__c FROM Equipment_Maintenance_Item__c WHERE Maintenance_Request__c = :closedMaintenanceRequests.get(mRequest.ParentId)];
-               //Best practice : not use 
-                List<Equipment_Maintenance_Item__c> originalEquipmentItems = [SELECT Equipment__c FROM Equipment_Maintenance_Item__c WHERE Maintenance_Request__c = :closedMaintenanceRequests.get(mRequest.ParentId)];
-                System.debug('Number of original Equipment Items: '+originalEquipmentItems.size());
-                if(!originalEquipmentItems.isEmpty()){
-                    for (Equipment_Maintenance_Item__c eqItem : originalEquipmentItems){   
-                        Equipment_Maintenance_Item__c newEquipmentItem = new Equipment_Maintenance_Item__c();
-                        newEquipmentItem.Equipment__c = eqItem.Equipment__c;
-                        newEquipmentItem.Maintenance_Request__c = mRequest.Id;
-                        System.debug('The New Equipment maintenane Item to create : '+newEquipmentItem); 
-                        newEquipmentItems.add(newEquipmentItem);   
-                        }
-                }
-                
-        }*/
-
-        // 
         // get ParentIds from newCreatedMRequests
         Set<Id> parentIds = new Set<Id>();
         for (Case mRequest : newCreatedMRequests) {

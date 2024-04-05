@@ -1,17 +1,17 @@
 @isTest
 public with sharing class MaintenanceRequestHelperTest {
     
-    private static final string STATUS_NEW = 'New';
-    private static final string STATUS_CLOSED = 'Closed';
-    private static final string STATUS_WORKING = 'Working';
-    private static final string PRIORITY = 'High';
-    private static final string TYPE_ROUTINE = 'Routine Maintenance';
-    private static final string TYPE_REPAIR = 'Repair';
-    private static final string SUBJECT = 'Test Maintenance Request subject';
+    private static final String STATUS_NEW = 'New';
+    private static final String STATUS_CLOSED = 'Closed';
+    private static final String STATUS_WORKING = 'Working';
+    private static final String PRIORITY = 'High';
+    private static final String TYPE_ROUTINE = 'Routine Maintenance';
+    private static final String TYPE_REPAIR = 'Repair';
+    private static final String SUBJECT = 'Test Maintenance Request subject';
     
     private static Vehicle__c createNewVehicle(){
-       Vehicle__c v = new Vehicle__c(name ='MyTestVehicule');
-        return v;
+       Vehicle__c vehicule = new Vehicle__c(Name ='MyTestVehicule');
+        return vehicule;
     }      
     private static Product2 createNewEquipment(){
         Product2 newEquipment = new Product2();
@@ -40,17 +40,14 @@ public with sharing class MaintenanceRequestHelperTest {
         // Test data setup
         Vehicle__c vehicle = createNewVehicle();
         insert vehicle;
-        id vehicleId = vehicle.Id;
         
         Product2 equipment = createNewEquipment();
         insert equipment;
-        Id equipmentId = equipment.Id;
         
-        Case maintenanceRequest= createNewMaintenanceRequest(vehicleId);
+        Case maintenanceRequest= createNewMaintenanceRequest(vehicle.Id);
         insert maintenanceRequest;
-        Id maintenanceRequestId = maintenanceRequest.Id;
         
-        Equipment_Maintenance_Item__c eqItem = createEquipmentItem(equipmentId,maintenanceRequestId);
+        Equipment_Maintenance_Item__c eqItem = createEquipmentItem(equipment.Id,maintenanceRequest.Id);
         insert eqItem;
        
         
@@ -60,14 +57,18 @@ public with sharing class MaintenanceRequestHelperTest {
         update maintenanceRequest;
         Test.stopTest();
         
-        List<Case> updatedMRequests = [SELECT Id, Status,Subject,Type,Vehicle__c FROM Case WHERE Status=:STATUS_NEW ];
-        List<Equipment_Maintenance_Item__c> eqItems = [select id
-                                                 from Equipment_Maintenance_Item__c
-                                                 where Maintenance_Request__c =:updatedMRequests[0].Id];
+        List<Case> updatedMRequests = 
+            [SELECT Id, Status,Subject,Type,Vehicle__c 
+            FROM Case 
+            WHERE Status = :STATUS_NEW ];
+        List<Equipment_Maintenance_Item__c> eqItems = [SELECT id
+                                                 FROM Equipment_Maintenance_Item__c
+                                                 WHERE Maintenance_Request__c =:updatedMRequests[0].Id];
         System.assert(updatedMRequests.size() == 1);
         System.assertEquals(updatedMRequests[0].Type, TYPE_ROUTINE);
         System.assertEquals(updatedMRequests[0].Vehicle__c,vehicleId);
-        System.assert(eqItems[0]!=null);
+        System.assert(!empty(eqItems));
+        
     
     }
      @isTest
@@ -75,17 +76,15 @@ public with sharing class MaintenanceRequestHelperTest {
         // Test data setup
         Vehicle__c vehicle = createNewVehicle();
         insert vehicle;
-        id vehicleId = vehicle.Id;
         
         Product2 equipment = createNewEquipment();
         insert equipment;
-        Id equipmentId = equipment.Id;
         
-        Case maintenanceRequest= createNewMaintenanceRequest(vehicleId);
+        Case maintenanceRequest= createNewMaintenanceRequest(vehicle.Id);
         insert maintenanceRequest;
-        Id maintenanceRequestId = maintenanceRequest.Id;
+
         
-        Equipment_Maintenance_Item__c eqItem = createEquipmentItem(equipmentId,maintenanceRequestId);
+        Equipment_Maintenance_Item__c eqItem = createEquipmentItem(equipment.Id,maintenanceRequest.Id);
         insert eqItem;
        
         
@@ -96,31 +95,35 @@ public with sharing class MaintenanceRequestHelperTest {
         update maintenanceRequest;
         Test.stopTest();
         
-        List<Case> updatedMRequests = [SELECT Id FROM Case WHERE Status=:STATUS_NEW ];
-        List<Case> workingMRequests = [SELECT Id FROM Case WHERE Status=:STATUS_WORKING ];
+        List<Case> updatedMRequests = [SELECT Id 
+                                        FROM Case 
+                                        WHERE Status=:STATUS_NEW ];
+        List<Case> workingMRequests = [SELECT Id 
+                                        FROM Case 
+                                        WHERE Status=:STATUS_WORKING ];
        
         System.assert(updatedMRequests.size() == 0);
-         System.assert(workingMRequests.size() == 1);
+        System.assert(workingMRequests.size() == 1);
         
     
     }
     
   @istest
     private static void testUpdateWorkOrdersBulk(){
-        list<Vehicle__C> vehicleList = new list<Vehicle__C>();
-        list<Product2> equipmentList = new list<Product2>();
-        list<Equipment_Maintenance_Item__c> equipmentItemList = new list<Equipment_Maintenance_Item__c>();
-        list<case> maintenanceRequestList = new list<case>();
-        list<id> oldRequestIds = new list<id>();
+        List<Vehicle__C> vehicleList = new List<Vehicle__C>();
+        List<Product2> equipmentList = new List<Product2>();
+        List<Equipment_Maintenance_Item__c> equipmentItemList = new list<Equipment_Maintenance_Item__c>();
+        List<case> maintenanceRequestList = new List<case>();
+        List<id> oldRequestIds = new List<id>();
         
-        for(integer i = 0; i < 300; i++){
+        for(Integer i = 0; i < 300; i++){
             vehicleList.add(createNewVehicle());
             equipmentList.add(createNewEquipment());
         }
         insert vehicleList;
         insert equipmentList;
         
-        for(integer i = 0; i < 300; i++){
+        for(Integer i = 0; i < 300; i++){
             maintenanceRequestList.add(createNewMaintenanceRequest(vehicleList.get(i).id));
         }
         insert maintenanceRequestList;
@@ -138,9 +141,9 @@ public with sharing class MaintenanceRequestHelperTest {
         update maintenanceRequestList;
         test.stopTest();
         
-        list<case> allRequests = [select id
-                                 from case
-                                 where status =: STATUS_NEW];
+        List<case> allRequests = [SELECT id
+                                 FROM case
+                                 WHERE status =: STATUS_NEW];
         
 
         
